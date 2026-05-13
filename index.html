@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pursue Fashion to Taste Life</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:   #F4B8C1;
+      --mint:   #A8DED8;
+      --coral:  #F0947A;
+      --blue:   #89B8D8;
+      --lime:   #C9DC7A;
+      --yellow: #F0D898;
+      --bg: #FAF8F5;
+      --text: #2A2420;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ---- Grain overlay ---- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.4;
+    }
+
+    /* ---- Layout ---- */
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      grid-template-columns: 1fr;
+      padding: 0;
+    }
+
+    /* ---- Header ---- */
+    header {
+      text-align: center;
+      padding: 40px 24px 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ---- Logo ---- */
+    .logo-wrap {
+      margin: 0 auto;
+      width: min(220px, 52vw);
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-wrap img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* ---- Main content ---- */
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px 24px;
+      gap: 36px;
+    }
+
+    /* ---- Image stage ---- */
+    .image-stage {
+      position: relative;
+      width: min(400px, 86vw);
+      aspect-ratio: 3/4;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 0.8s;
+    }
+
+    .product-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+      transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.6s cubic-bezier(0.4,0,0.2,1);
+      opacity: 0;
+      transform: scale(1.015);
+    }
+
+    .product-img.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Accent frame that changes color */
+    .image-stage::before {
+      content: '';
+      position: absolute;
+      inset: -8px -8px auto auto;
+      width: 48%;
+      height: 48%;
+      border-top: 2px solid var(--accent, #F4B8C1);
+      border-right: 2px solid var(--accent, #F4B8C1);
+      border-radius: 0 4px 0 0;
+      z-index: 1;
+      transition: border-color 0.5s ease;
+      pointer-events: none;
+    }
+
+    .image-stage::after {
+      content: '';
+      position: absolute;
+      inset: auto auto -8px -8px;
+      width: 48%;
+      height: 48%;
+      border-bottom: 2px solid var(--accent, #F4B8C1);
+      border-left: 2px solid var(--accent, #F4B8C1);
+      border-radius: 0 0 0 4px;
+      z-index: 1;
+      transition: border-color 0.5s ease;
+      pointer-events: none;
+    }
+
+    /* ---- Color label ---- */
+    .color-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.15em;
+      text-transform: lowercase;
+      color: var(--text);
+      opacity: 0.55;
+      min-height: 1.4em;
+      text-align: center;
+      transition: opacity 0.3s ease;
+    }
+
+    /* ---- Color selector ---- */
+    .color-selector {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 1.1s;
+    }
+
+    .swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      outline: none;
+      position: relative;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      background: var(--swatch-color);
+    }
+
+    .swatch::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1.5px solid transparent;
+      transition: border-color 0.25s ease;
+    }
+
+    .swatch:hover {
+      transform: scale(1.12);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    .swatch.selected::after {
+      border-color: var(--swatch-color);
+    }
+
+    .swatch.selected {
+      transform: scale(1.18);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      text-align: center;
+      padding: 20px 24px 32px;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(42,36,32,0.25);
+      font-weight: 200;
+    }
+
+    /* ---- Animation ---- */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="logo-wrap" id="logoWrap">
+      <img src="/mnt/user-data/uploads/1dfe93d1-3f5b-412c-9842-f4dd1827d614.jpg" alt="Ivory Bamboo" />
+    </div>
+  </header>
+
+  <main>
+    <div class="image-stage" id="imageStage">
+      <img class="product-img" id="img-pink"   src="/mnt/user-data/uploads/e06b04b8-da69-4333-81cc-f66bf1118417.jpg" alt="Pink set" />
+      <img class="product-img" id="img-mint"   src="/mnt/user-data/uploads/6730ffb0-0389-4a02-a2d3-51bef726f99c.jpg" alt="Mint set" />
+      <img class="product-img" id="img-coral"  src="/mnt/user-data/uploads/7ea68b21-4b88-4e3e-adad-2321e5328cfc.jpg" alt="Coral set" />
+      <img class="product-img" id="img-blue"   src="/mnt/user-data/uploads/2555b8c3-1dba-47ea-be10-f11853959727.jpg" alt="Blue set" />
+      <img class="product-img" id="img-lime"   src="/mnt/user-data/uploads/dd7ed116-4ba8-4053-b88d-64fb13527a95.jpg" alt="Lime set" />
+      <img class="product-img" id="img-yellow" src="/mnt/user-data/uploads/e5811680-e6fd-4eb2-91bf-9c5978d1faa9.jpg" alt="Yellow set" />
+    </div>
+
+    <p class="color-label" id="colorLabel">rose</p>
+
+    <div class="color-selector" role="group" aria-label="Select color">
+      <button class="swatch selected" style="--swatch-color:#F4B8C1" data-color="pink"   data-label="rose"    aria-label="Rose"    aria-pressed="true"></button>
+      <button class="swatch"          style="--swatch-color:#A8DED8" data-color="mint"   data-label="mint"    aria-label="Mint"    aria-pressed="false"></button>
+      <button class="swatch"          style="--swatch-color:#F0947A" data-color="coral"  data-label="coral"   aria-label="Coral"   aria-pressed="false"></button>
+      <button class="swatch"          style="--swatch-color:#89B8D8" data-color="blue"   data-label="blue"    aria-label="Blue"    aria-pressed="false"></button>
+      <button class="swatch"          style="--swatch-color:#C9DC7A" data-color="lime"   data-label="citrus"  aria-label="Citrus"  aria-pressed="false"></button>
+      <button class="swatch"          style="--swatch-color:#F0D898" data-color="yellow" data-label="butter"  aria-label="Butter"  aria-pressed="false"></button>
+    </div>
+  </main>
+
+  <footer>crafted with taste &nbsp;·&nbsp; all rights reserved</footer>
+</div>
+
+<script>
+  const swatches   = document.querySelectorAll('.swatch');
+  const images     = document.querySelectorAll('.product-img');
+  const label      = document.getElementById('colorLabel');
+  const stage      = document.getElementById('imageStage');
+
+  function activate(color, labelText, swatch) {
+    // Swap image
+    images.forEach(img => img.classList.remove('active'));
+    const target = document.getElementById('img-' + color);
+    if (target) target.classList.add('active');
+
+    // Update accent color
+    stage.style.setProperty('--accent', swatch.style.getPropertyValue('--swatch-color'));
+
+    // Update label
+    label.style.opacity = '0';
+    setTimeout(() => {
+      label.textContent = labelText;
+      label.style.opacity = '0.55';
+    }, 200);
+
+    // Update swatch states
+    swatches.forEach(s => {
+      s.classList.remove('selected');
+      s.setAttribute('aria-pressed', 'false');
+    });
+    swatch.classList.add('selected');
+    swatch.setAttribute('aria-pressed', 'true');
+  }
+
+  swatches.forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      activate(swatch.dataset.color, swatch.dataset.label, swatch);
+    });
+  });
+
+  // Init: show first image
+  window.addEventListener('DOMContentLoaded', () => {
+    const first = document.querySelector('.swatch');
+    activate(first.dataset.color, first.dataset.label, first);
+  });
+</script>
+</body>
+</html>
